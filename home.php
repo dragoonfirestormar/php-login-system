@@ -26,6 +26,8 @@ if (!isset($_SESSION['loggedin'])) {
 			<h2>Home Page</h2>
 			<div>
 				<p>Welcome back, <?=$_SESSION['name']?>!</p>
+			</div>
+			<div>
 				<?php
 				$msg="";
 				if($_SERVER['REQUEST_METHOD']=='POST'){
@@ -60,6 +62,42 @@ if (!isset($_SESSION['loggedin'])) {
 				<?php
 					echo $msg;
 				?>
+				
+				
+			</div>
+
+			<div>
+				<p>COMMENTS</p>
+				<table>
+					
+				<?php
+					include('db.php');
+					$stmt = $con->prepare('SELECT cmt_id, person, person_id, content FROM comments ORDER BY `cmt_id` DESC LIMIT 5'); //WHERE id > ?
+					//$stmt->bind_param('i', $id);
+					$stmt->execute();
+					$stmt->bind_result($cmt_id, $person, $person_id, $content);
+					$persons = array();
+					$contents = array();
+					for($i=0;$i<5;$i++){
+						$stmt->fetch();
+						$persons[$i]=$person;
+						$contents[$i]=$content;
+					}
+					$persons=array_reverse($persons);$contents=array_reverse($contents);
+					for($i=0;$i<5;$i++){
+						echo "<tr>\n";
+						echo "<td>" . $persons[$i] . ":</td>\n";
+						echo "<td>" . $contents[$i] . "</td>\n";
+						echo "</tr>\n	";
+					}
+					$stmt->close();
+				?>
+				</table>
+		
+				<form action="merica.php" method="POST">
+				<textarea type="text" name="comment" placeholder="Comment" id="comment" rows="1" cols="20" required style = "position:relative;  top:6px;"></textarea>
+				<input type="submit" name="commentSubmit" value="Post">
+				</form>
 			</div>
 		</div>
 		
